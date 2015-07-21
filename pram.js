@@ -26,7 +26,7 @@ app.use('/config', express.static(__dirname + '/config'));
 app.use('/features', express.static(__dirname + '/public/features'));
 
 app.all('*', function(req, res, next) {
-  // CORS headers
+  // CORS Headers 
   console.log('allow origin');
   res.header("Access-Control-Allow-Origin", "*"); // restrict it to the required domain
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
