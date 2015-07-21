@@ -1,0 +1,34 @@
+div(ng-app="myApp")
+  div(ng-controller="RequestCtrl")
+    form#addItemForm(ng-submit="addItem('Item_Name')" ng-init="loadCategories(#{categories})")
+        table.table.table-bordered.table-hover
+          thead
+            tr.active
+              th Field
+              th Value
+            tr
+              td Name
+              td 
+                input.form-control#new_Item_Name(type='text' placeholder='-- Name --' ng-model='newItemName' mandatory=1 data-autocomplete="field:Item_Name; options_element:newOptions;")
+            tr
+              td Category
+              td 
+                - var options = JSON.parse(categories)
+                select.form-control#new_Item_Category(name='Item_Category' placeholder='-- Category --')
+                    option(value='0' label='-- Select Category')
+                    each category in options
+                      option(value=category.value label=category.label)
+            tr
+              td Catalog
+              td 
+                input.form-control#new_Item_Catalog(type='text' placeholder='-- Catalog --' ng-model='newItemCatalog' data-autocomplete="field:Item_Catalog; options_element:newOptions;" )
+            tr
+              td Vendor 
+              td
+                input.form-control#Vendor_ID(type='text' placeholder='-- Vendor --' ng-model='ItemVendor' data-autocomplete="field:Vendor_Name; onSuccess:<div class='alert alert-success'>Valid Vendor Found</div><P>Click on Id to select; onEmpty:<div class='alert alert-danger'>Vendor not Found</div><P>please contact Admin to add new Vendor; options_element:newOptions; set:Vendor_ID; show:Vendor_ID,Vendor_Name; target:Vendor_ID; query:SELECT DISTINCT Vendor_ID,Vendor_Name FROM Vendor")
+
+      button.btn.btn-success(value="Add Item", onclick="return validateAngularForm('addItemForm')") Add Item(s)
+      input#newOptions(type='hidden' url="/pram/api/q" dataKey='data' displayBlock='internalMessagei2' onSuccess="Similar Item Found<P><div class='alert alert-danger'>Please do not create a new Item if this is the same thing</div>" onEmpty="<div class='alert alert-success'>No Similar Items Found - (Okay)</div>" query="SELECT DISTINCT Item_Name,Item_Catalog FROM Item" show="Item_Name,Item_Catalog")
+  hr
+  div#internalMessage
+

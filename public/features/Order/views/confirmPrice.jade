@@ -1,0 +1,56 @@
+div
+  div
+    form#confirmPriceForm(name='confirmPriceForm')
+      x
+        table.table
+          thead
+            tr.active
+              td Vendor
+              th {{ items[0].Vendor }} 
+            tr.active
+              td Contact Phone
+              th {{ items[0].Vendor_Phone }}
+        table.table.table-bordered
+          thead
+            tr
+              th Item
+              th Catalog
+              th Cost
+              th Confirm
+            tr(ng-repeat='item in items')
+              td {{ item.Name }}
+              td {{ item.Catalog }}
+              td 
+                  table
+                    tr(id='oldPrice{{$index}}' style='display:block')
+                      td(colspan=2) 
+                        span(ng-if="item.Cost && !item.fixPrice")
+                            form.form-inline
+                                div.form-group.has-success.has-feedback
+                                    label.control-label(for='cost{{$index}}') Cost:
+                                    input.form-control(id = 'cost{{$index}}' type='text' ng-model='item.Cost' ng-disabled=1)
+                                    span.glyphicon.glyphicon-ok.form-control-feedback(aria-hidden='true')
+                        span(ng-if="!item.Cost")
+                            span Last Cost: &nbsp;
+                            input.form-control(type='text' ng-model='item.Item_Cost' ng-disabled=1)
+                        span(ng-if="item.fixPrice")
+                            b New Price: &nbsp;
+                            input.form-control(type='text' ng-model='item.Cost')
+                            span &nbsp;
+                            input(type='checkbox' ng-model='item.updateCost')
+                            span &nbsp; update DB 
+              td 
+                a(href='#' ng-click="confirmPrice($index);")
+                  button.btn.btn-warning(type='button' )
+                    i.glyphicon.glyphicon-ok
+                span &nbsp;
+                a(href='#' ng-click='fixPrice($index);')
+                  button.btn.btn-warning(type='button')
+                    i.glyphicon.glyphicon-remove
+  hr
+  a(href='#' )
+    button.btn.btn-primary(type='button' onclick="alert('... generate Price History Report for this Item');") View Price History for this Item
+
+  div#internalMessage
+
+ 

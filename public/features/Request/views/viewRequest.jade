@@ -1,0 +1,78 @@
+extends layout
+block content
+ - var Table = 'Item';
+ div(ng-app="requestApp")
+  div(ng-controller="reqController")
+    div.alert.alert-info Purchase Request #{id} 
+    p title: {{ title }}
+    div#topMessage
+    form#request(ng-submit="editRequest()" ng-init="loadRequest('#{request}', '#{items}')")
+      button(ng-click="loadRequest('#{id}')")
+      table(width='100%')
+        tr
+          td Requested By: 
+            b {{ requester }}
+          td(align='right') Request Date:
+            b {{ requestDate }} 
+      hr
+      table(width='100%')
+        tr
+          td(width='30%')
+            table
+              tr 
+                td 
+                  b Cost Centre: 
+                td
+                  {{ costCentreCode }} - {{ costCentreDescription }}
+           td(style='text-align:top; padding:50px')
+             textarea#Request_Notes.form-control(type='textarea' placeholder='-- Notes --' rows='5' ng-model='requestNotes') 
+          td(width='300px')
+            table.table.table-bordered
+              tr
+                td 
+                  b Items: 
+                td.success(width='200px') {{ items.length }}
+              tr
+                td 
+                  b Sub Total :  
+                td.warning(style='text-align:right') ${{ subTotal }}
+              tr
+                td 
+                  b PST :
+                td.active(style='text-align:right') ${{ pstTotal }}
+              tr
+                td 
+                  b GST :  
+                td.active(style='text-align:right') ${{ gstTotal }}
+              tr
+                td 
+                  b Total : 
+                td.danger(style='text-align:right') ${{ costTotal }} 
+      table.table.table-bordered.table-hover
+          thead
+            tr.active
+              th(width='100px')
+              th(width='100px') Qty
+              th(width='100px') Cost Estimate
+              th(width='100px') Item_ID 
+              th Item
+              th Catalog
+              th Vendor
+              th Notes
+              th(width='200px') Cost_Total
+            tr(ng-repeat="item in items")
+              ng-form(name='ItemForm')
+                td
+                td {{ item.Qty }}
+                td ${{ item.Cost }}
+                td {{ item.Id }}
+                td {{ item.Name }}
+                td {{ item.Catalog }}
+                td {{ item.Vendor }}
+                td {{ item.Notes }}
+                td.warning(style='align=right') ${{ item.Total }}
+      a(href="/request/submit")
+        button.btn.btn-primary Edit Request
+    hr
+    div#message
+

@@ -1,0 +1,166 @@
+extends layout
+block content
+ div(ng-app="myApp")
+  if (recordId) 
+    - Config['recordId'] = recordId
+  else
+    - recordId = Config['recordId']
+
+  - var URL = Config['URL']
+  - var init = "initialize('" + JSON.stringify(Config) + "')";
+
+  - var postAction = 'saveRecord()';
+  if (recordId)
+    - postAction = 'updateRecord()';
+  else
+
+  div(ng-controller="Nto1Ctrl")
+   div(ng-controller="RequestCtrl"  ng-init="#{init}")
+    div(ng-if="recordId") 
+      div.alert.alert-success
+        button(type='button' ng-click="loadRecord(recordId)") Request # {{recordId}}
+    div(ng-if="! recordId")
+      div.alert.alert-info New Request
+
+    div(ng-if="mainMessage")
+      div.alert.alert-warning#topMessage {{ mainMessage }}
+
+    div(ng-if="pendingChanges.length && recordId")
+      div.alert.alert-danger
+        Note Pending Changes:  (save to commit changes)
+          ul
+            li(ng-repeat="change in pendingChanges") {{ change }}
+        hr
+        a(href="/request/submit/{{recordId}}")
+          button.btn.btn-primary(value="Request") Save Changes
+        span &nbsp;
+        a(href="/request/{{recordId}}")
+          button.btn.btn-danger(type='button' value="Cancel") Cancel Changes
+ 
+    form#requestForm(name='RequestForm' novalidate role='form')
+      table(width='100%')
+        tr
+          td 
+            table.table
+              tr
+                td Status: &nbsp;
+                td
+                  b {{ recordStatus }}
+                td Requested: &nbsp;
+                  b {{ Request_Date }}
+                td By: &nbsp;
+                  b {{user}} [ {{userid}}]
+              tr
+                td 
+                  b Cost Centre:
+                td(colspan=2)
+                    - var preload = "loadLookup('/pram/api/lookup/Cost_Centre', 'Cost_Centre', '', 4)";
+                    div(ng-disabled="!(uiMode =='Edit') && recordStatus!='Draft'" ng-dropdown-multiselect="" ng-required=1 options="Lookup.Cost_Centre.options" selected-model="Cost_Centre" ng-click="syncLookup('Cost_Centre','Cost_Centre_ID','Cost_Centre_Label')" extra-settings="MenuSettings" ng-init="#{preload}")
+              tr
+                td Notes: &nbsp; 
+                td(colspan=3)
+                    textarea#Request_Notes.form-control(ng-disabled="!(uiMode =='Edit') && recordStatus!='Draft'" type='textarea' placeholder='-- Notes --' rows='5' ng-model='Request_Notes' ng-required=1) 
+          td(width='100px') &nbsp; 
+          td(width='300px')
+            table.table
+                    tr
+                      td 
+                        b Items: 
+                      td.success(width='200px') {{ items.length }}
+                    tr
+                      td 
+                        b Subtotal:  
+                      td.warning(style='text-align:right') ${{ subTotal }}
+                    tr
+                      td 
+                        b PST:
+                      td.active(style='text-align:right') ${{ pstTotal }}
+                    tr
+                      td 
+                        b GST:  
+                      td.active(style='text-align:right') ${{ gstTotal }}
+                    tr
+                      td 
+                        b Total: 
+                      td.danger(style='text-align:right') ${{ costTotal }}
+
+      b Record: {{ recordId }}
+      hr
+      span(ng-if="recordId")
+        span(ng-if="pendingChanges.length")
+          a(href="#")
+            button.btn.btn-primary(value="Request", ng-disabled=0) Save Changes to Existing Request 
+        span &nbsp;
+        a(href='#')
+          button.btn.btn-primary(value="Requisition",  ng-click="alert('Clone this Record... in process'); cloneRecord()" ) Clone Record 
+        span &nbsp; 
+        a(href='#')
+          button.btn.btn-primary(ng-click="editMode(1)") Edit
+        span &nbsp;
+      span(ng-if="! recordId")
+          a(href="#")
+            button.btn.btn-primary(ng-click='createRequest()' ng-disabled="RequestForm.$invalid") Submit Current Request
+          span &nbsp;
+
+      //- Display Current Items 
+      div {{items.length}} Items Pending Request: {{ topValue }} {{ middleValue }}
+        table.table.table-brequested.table-hover
+          thead
+            tr.active
+              th(width='80px')
+              th(width='80px') Qty
+              th Item
+              th Catalog
+              th Vendor
+              th Notes
+              th Deliver To
+              th(width='80px') Cost Estimate
+              th(width='200px') Cost Total
+            tr(ng-repeat="item in items")
+              td 
+                button.btn.btn-danger.btn-xs(type='button' value="Delete" ng-click="deleteItem($index)") X
+                span &nbsp;
+                button.btn.btn-warning.btn-xs(type='button' data-toggle='modal' data-target='#editItemModal') Edit
+              td 
+                input(ng-disabled='recordId' id='Item_Qty_{{$index+1}}' type='text' ng-model='item.Qty' ng-change="updateTotals()" mandatory=1)
+              td {{ item.Name }}
+              td {{ item.Catalog }}
+              td {{ item.Vendor }} 
+              td 
+                input(ng-disabled='recordId' id='Item_Request_Notes_{{$index+1}}' type='text' ng-model='item.Item_Request_Notes' placeholder = '-- Notes --')        
+              td 
+                input(ng-disabled='recordId' id='Item_Deliver_To_{{$index+1}}' type='text' ng-model='item.Deliver_To' placeholder = '-- Deliver To --')                      
+              td ${{ item.Cost }}
+              td.warning(style='align=right') ${{ item.itemTotal }}
+
+      input#FKRequester_User__ID(type='hidden' value='#{Config.userid}') 
+      include smartSearch
+
+    div.modal.fade#newItemModal
+      div.modal-dialog
+        div.modal-content
+          div.modal-header
+            button.close(type="button" class="close" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+            h4.modal-title Add New Item
+          div.modal-body
+            include newItem.jade
+            hr
+            div#insideModal
+          div.modal-footer
+           button.btn.btn-default(type="button button-danger" data-dismiss="modal") Close
+
+    div.modal.fade#editItemRequestModal
+      div.modal-dialog
+        div.modal-content
+          div.modal-header
+            button.close(type="button" class="close" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+            h4.modal-title Edit Item Request
+          div.modal-body
+            include editItemRequest.jade
+            hr
+            div#insideModal
+          div.modal-footer
+           button.btn.btn-default(type="button button-danger" data-dismiss="modal") Close
+

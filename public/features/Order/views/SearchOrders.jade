@@ -1,0 +1,18 @@
+extends layout
+block content
+	h4 Recent #{status} Orders
+	table.table.table-bordered
+		tr 
+			each field in Fields
+				th #{field}
+		if found 
+			tr(ng-repeat="order in Orders")
+				each field in Fields
+					- var val = order[field];
+					td #{val}
+		else
+			tr
+				td(colspan=4) (no applicable items)
+
+	div(ng-app="myApp")
+		include smartSearch

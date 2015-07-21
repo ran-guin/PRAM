@@ -1,0 +1,321 @@
+extends layout
+block content
+ div(ng-app="myApp")
+  if (recordId) 
+    - Config['recordId'] = recordId
+  else
+    - recordId = Config['recordId']
+
+  - var url = Config['url']
+  - var init = "initialize('" + JSON.stringify(Config) + "')";
+
+  - var postAction = 'saveRecord()';
+  if (recordId)
+    - postAction = 'updateRecord()';
+  else
+
+  div(ng-controller="Nto1Ctrl")
+    div(ng-controller='OrderCtrl' ng-init='#{init}')
+      div(ng-cloak)
+
+        div.alert.alert-success(ng-if="recordId") Order '<B># {{ recordId }}'</B> [ status = '<B>{{ recordStatus }}</B>' ]
+        div.alert.alert-info(ng-if="!recordId") New Requisition [ status = '{{ recordStatus }}' ]
+
+      div(ng-if="mainMessage")
+        div.alert.alert-warning#topMessage {{ mainMessage }}
+
+      div(ng-if="pendingChanges.length && #{recordId}")
+        div.alert.alert-danger
+          Note Pending Changes:  (save to commit changes)
+            ul
+              li(ng-repeat="change in pendingChanges") {{ change }}
+          hr
+          a(href="/requisition/submit/#{recordId}")
+            button.btn.btn-primary(value="Requisition", ng-disabled=1) Save Changes
+          span &nbsp;
+          a(href="/requisition/#{recordId}")
+            button.btn.btn-danger(type='button' value="Cancel") Cancel Changes
+          
+      form#recordForm(name='recordForm' ng-submit="#{postAction}" ng-init='setColors()' role="form")
+        each value, key in Config
+          input(type='hidden' id='#{key}' value='#{value}')
+
+        div.alert.alert-danger(ng-if="debugMode") Configs:
+          each value, key in Config
+            span #{key} = #{value}; &nbsp; 
+
+        table(width='100%')
+          tr
+            td(valign='top')
+              table.table
+                tr
+                  td Created:
+                  td 
+                    b {{ created }}
+                  td By: &nbsp; 
+                    b {{ creator }} 
+                  td(class = '{{ PendingClass }}') For: &nbsp;
+                    b {{ owner }}
+                  td {{ creatorId}}/{{ownerId}}
+                tr(class='{{reqClass}}')
+                  td Funding Source:
+                  td(colspan=3 class='{{PendingClass}}')
+                    div(ng-if="recordId")
+                      b {{ items[0]['CostCentre']}}
+                    div(ng-if="!recordId")
+                      - var preload = "loadLookup('/pram/api/lookup/Cost_Centre', 'Cost_Centre', 'CostCentre')";
+                      div(ng-dropdown-multiselect="" options="Lookup.CostCentre.options" selected-model="CostCentre" extra-settings="MenuSettings" ng-init="#{preload}")
+                tr(class='{{reqClass}}')
+                  td Vendor / ID
+                  td(colspan=3 class='{{PendingClass}}') 
+                    input.form-control(type='text' ng-disabled="1" ng-model='Vendor' placeholder='-- Vendor --' required)
+                  td {{ Vendor_ID }}
+                tr
+                  td Notes:
+                  td(colspan=3)
+                    div(ng-if="PendingClass || RequisitionedClass || OrderedClass")
+                      textarea#Requisition_Notes.form-control(type='textarea' placeholder='-- Notes --' rows='5' ng-model='Requisition_Notes') 
+
+            td(valign='top' style='background-color:#eee')
+              table.table.table-condensed
+                tr(class='{{reqClass}}')
+                  td(align='right') Requisitioned
+                  td(class='{{reqClass}}')
+                    b {{ requisitioned }} 
+                    input#User_ID(type='hidden' )
+                  td(align='right') By:
+                  td
+                    b {{ requisitioner }}         
+                tr(class='{{reqClass}}')
+                  td(align='right') Requisition #
+                  td(colspan=3 class='{{PendingClass}}')
+                    input.form-control(type='text' ng-disabled="!(uiMode=='Edit') && !PendingClass" ng-model='Requisition_Number' placeholder='-- ePro # --' ng-required="PendingClass")
+                tr    
+                  td(align='right') Quote
+                  td(colspan=3 class='{{PendingClass}}')
+                    input.form-control(type='text' ng-disabled="!(uiMode=='Edit') && !PendingClass" ng-model='Quote' placeholder='-- if applicable--' )
+                tr(style='border-top:solid 3px')
+                  td(align='right') Ordered: 
+                  td 
+                    b {{ ordered }}
+                  td(align='right') By: 
+                  td
+                    b {{ orderer }} : {{ ordererid }}
+                tr
+                  td(align='right') PO Number:
+                  td(colspan=3 class="{{RequisitionedClass}}")
+                    input.form-control(type='text' ng-disabled="!(uiMode=='Edit') && RequisitionedClass==''" ng-model='PONumber' placeholder='-- PO # --' ng-required="RequisitionedClass")
+                tr
+                  td(align='right') PO Date:
+                  td(colspan=3 class="{{RequisitionedClass}}")
+                      p.input-group
+                        input.form-control(datepicker-popup='yyyy-MM-dd' ng-model='PODate' is-open='opened' datepicker-options="dateOptions" close-text='close' ng-disabled="!(uiMode =='Edit') && RequisitionedClass==''" ng-required="RequisitionedClass")
+                        span.input-group-btn
+                          button.btn.btn-default(type='button' ng-click="open($event)")
+                            i.glyphicon.glyphicon-calendar
+
+                    //- input.form-control(type='text' ng-disabled="!(uiMode =='Edit') && RequisitionedClass==''" ng-model='PODate' placeholder='-- PO Date --' ng-required="RequisitionedClass") 
+            td(valign='top')
+              div(ng-if="PendingClass")
+                table.table
+                  tr
+                    td(style='text-align:right; border:0px')
+                      b # of Items: 
+                    td.success(style='text-align:center; width:200px') {{ items.length }}
+                  tr
+                    td(style='text-align:right; border:0px') 
+                      b Subtotal: 
+                    td.warning(style='text-align:right; border-top:solid 3px') ${{ subTotal }}
+                  tr
+                    td(style='text-align:right; border:0px') 
+                      b PST:
+                    td.active(style='text-align:right') ${{ pstTotal }}
+                  tr
+                    td(style='text-align:right; border:0px')
+                      b GST:  
+                    td.active(style='text-align:right') ${{ gstTotal }}
+                  tr
+                    td(style='text-align:right; border:0px') 
+                      b Total: 
+                    td.danger(style='text-align:right') ${{ costTotal }}
+              div(ng-if="!PendingClass")
+                table(width='100%' style='border:0px')
+                  tr
+                    td(style='text-align:right; border:0px') Last Updated: &nbsp;
+                    td 
+                      b {{ Last_Updated }}
+                  tr
+                    td(style='text-align:right; border:0px') By: &nbsp; 
+                    td 
+                      b {{updater}}
+                  tr
+                    td(style='text-align:right; border:0px') &nbsp;
+            
+        div {{items.length}} Requests included in this Order:
+
+          table.table.table-bordered(width='100%')
+            thead
+              tr.alert.alert-success
+                td &nbsp;
+                td Requested
+                td By:
+                td Item
+                td Received
+                td Cost
+                //- td Curr
+                //- td Category
+                td Vendor
+                td Catalog #
+                td Deliver To
+                td Notes
+                td Sub Total
+            tbody
+              tr(ng-repeat="item in items")
+                td 
+                  span(ng-if="PendingClass || ReceivingClass || RequisitionedClass")                    
+                    button.btn.btn-danger.btn-xs(type='button' value="Delete" ng-click="deleteItem($index)") X
+                  span(ng-if="item.saved && editAccess['Item_Request']")
+                    span &nbsp;
+                    button.btn.btn-warning.btn-xs(type='button' data-toggle='modal' data-target='#editItemRequestModal') Edit
+                  span(ng-if="!item.saved")
+                    span &nbsp;
+                    button.btn.btn-success.btn-xs(type='button' data-toggle='modal' ng-click="saveIRChanges($index)") Include &nbsp;                
+                  span.nav.pull-right(ng-if="item.Received_Qty >= item.Qty") &nbsp;
+                      span &nbsp;
+                      i.glyphicon.glyphicon-ok
+                td {{ item.Request_Date }}
+                td {{ item.Requested_By }}
+                td {{ item.Name }} [R#: {{ item.Item_Request_ID}}]
+                td {{ item.Received_Qty }} / {{ item.Qty }} &nbsp;
+                  span(ng-if="item.Received_Qty") &nbsp; [{{ item.Received_Date }}]
+                    span.nav.pull-right
+                      a(href='#' onclick="alert('get receipt history...to be added...')")
+                        i.glyphicon.glyphicon-question-sign
+                td(class = '{{ PendingClass }}')
+                  input(class = '{{ PendingClass }}' ng-required=1 type='text' ng-disabled=1 ng-model='item.Cost')
+                  span.nav.pull-right(ng-if="item.Cost")
+                    button.btn.btn-success.btn-xs(type='button' data-toggle='modal' ng-click="activateIndex($index)" data-target='#confirmPriceModal')
+                      i.glyphicon.glyphicon-ok
+                  span.nav.pull-right(ng-if="! item.Cost")
+                    span &nbsp;
+                    button.btn.btn-danger.btn-xs(type='button' data-toggle='modal' ng-click="activateIndex($index)" data-target='#confirmPriceModal') ?
+
+                //- td {{ item.Currency }}
+                //- td {{ item.Category }}
+                td {{ item.Vendor }} [V#: {{ item.Vendor_ID }}]
+                td {{ item.Catalog }}
+                td {{ item.DeliverTo }}           
+                td {{ item.Notes }}
+                td.warning(style='align=right') ${{ item.Total }}
+        div(ng-if="recordId")
+          div(ng-if="OrderedClass")
+            a(href="#")
+            button.btn.btn-primary.btn(type='button' data-toggle='modal' data-target='#receiveItemModal') Receive Items
+            span &nbsp;           
+          div(ng-if="nextStatus && !OrderedClass")
+            a(href="#")
+              button.btn.btn-primary( ng-click="saveChanges(nextStatus)" ng-disabled="recordForm.$invalid") Save as {{nextStatus}}
+            //- span &nbsp;
+            //- a(href='#')
+            //-   button.btn.btn-primary(value="Requisition",  ng-click="cloneRecord()" ng-disabled="recordForm.$invalid") Clone Record    
+            span &nbsp;
+            a(href='#')
+            button.btn.btn-warning(ng-click="editMode(1)") Edit Previously Entered Data
+        div(ng-if="! recordId")
+            a(href="#")
+              button.btn.btn-primary(value="Requisition",  ng-click="createRequisition()" ng-disabled="recordForm.$invalid") Submit Requisition
+
+        p &nbsp;
+        div(ng-if="!PendingClass && !RequisitionedClass && !OrderedClass")
+          hr
+          table.table(width='100%')
+            tr
+              td(style='border:0px')
+                span Order Notes:
+                  textarea#Requisition_Notes.form-control(type='textarea' placeholder='-- Notes --' rows='5' ng-model='Requisition_Notes') 
+              td(style='border:0px; width:400px' )
+                table.table
+                  tr
+                    td(align='right' style='border:0px') Reconciled: &nbsp;
+                    td(style='border:0px') 
+                      b {{ reconciled }}
+                  tr
+                    td(align='right' style='border:0px') By: &nbsp;
+                    td(style='border:0px')
+                      b {{ reconciler }}
+                  tr
+                    td(align='right' style='border:0px') Invoice # &nbsp;
+                    td(class="{{ReceivedinFullClass}}" style='border:0px')
+                      input.form-control(type='text' ng-model='invoiceNo' placeholder = '-- Invoice # --' ng-disabled="!(uiMode=='Edit') && !ReceivedinFullClass" ng-required="ReceivedinFullClass")
+                  tr
+                    td(align='right' style='border:0px') Ledger # &nbsp;
+                    td(class="{{ReceivedinFullClass}}" style='border:0px')
+                      input.form-control(type='text' ng-model='ledgerNo' placeholder = '-- Ledger # --' ng-disabled="!(uiMode=='Edit') && !ReceivedinFullClass" ng-required="ReceivedinFullClass")    
+               
+              td(style='border:0px; width:400px')
+                table.table
+                  tr
+                    td(style='text-align:right; border:0px')
+                      b # of Items: 
+                    td.success(width='200px') {{ items.length }}
+                  tr
+                    td(style='text-align:right; border:0px') 
+                      b Subtotal: 
+                    td.warning(style='text-align:right; border-top:solid 3px') ${{ subTotal }}
+                  tr
+                    td(style='text-align:right; border:0px') 
+                      b PST:
+                    td.active(style='text-align:right') ${{ pstTotal }}
+                  tr
+                    td(style='text-align:right; border:0px')
+                      b GST:  
+                    td.active(style='text-align:right') ${{ gstTotal }}
+                  tr
+                    td(style='text-align:right; border:0px') 
+                      b Total: 
+                    td.danger(style='text-align:right') ${{ costTotal }}
+
+      div(ng-if="recordStatus == 'Pending' || recordStatus == 'Requisitioned'" style="background-color:#ddd;")
+      include smartSearch      
+
+      div.modal.fade#receiveItemModal
+        div.modal-dialog(style='width:900px')
+          div.modal-content
+            div.modal-header
+              button.close(type="button" class="close" data-dismiss="modal" aria-label="Close")
+                span(aria-hidden="true") &times;
+              h4.modal-title Receive New Item
+            div.modal-body
+              include receiveItem.jade
+              hr
+              div#insideModal
+            div.modal-footer
+             button.btn.btn-default(type="button button-danger" data-dismiss="modal") Close
+
+      div.modal.fade#editItemRequestModal
+        div.modal-dialog
+          div.modal-content
+            div.modal-header
+              button.close(type="button" class="close" data-dismiss="modal" aria-label="Close")
+                span(aria-hidden="true") &times;
+              h4.modal-title Edit Item Request
+            div.modal-body
+              include editItemRequest.jade
+              hr
+              div#insideModal2
+            div.modal-footer
+             button.btn.btn-default(type="button button-danger" data-dismiss="modal") Close
+
+      div.modal.fade#confirmPriceModal
+        div.modal-dialog(style='width:1200px')
+          div.modal-content
+            div.modal-header
+              button.close(type="button" class="close" data-dismiss="modal" aria-label="Close")
+                span(aria-hidden="true") &times;
+              h4.modal-title Confirm Price
+            div.modal-body
+              include confirmPrice.jade
+              hr
+              div#insideModal3
+            div.modal-footer
+             button.btn.btn-default(type="button button-danger" data-dismiss="modal") Close 

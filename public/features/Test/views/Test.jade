@@ -1,0 +1,53 @@
+
+head
+	link(href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet")
+body
+	div.container
+		div(ng-app="myApp") 
+			div(ng-controller="Nto1Ctrl") 
+				button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo") Simple collapsible
+					div(id="demo" class="collapse in")
+						p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+				div(ng-controller="TestCtrl")
+					b Example: {{example7data}} ->  {{example7model}}
+					div(ng-dropdown-multiselect="" options="example7data" selected-model="example7model" extra-settings="MenuSettings")
+					b Select: 
+					div(ng-dropdown-multiselect="" options="exampleData" selected-model="exampleModel" extra-settings="MenuSettings")
+					b {{exampleData}}
+					button(ng-click="example7model={'id' : 3, 'label' : 'Danny'}") set
+
+					hr
+
+					h4 Inline
+					div(style="display:inline-block; min-height:290px;")
+						input.form-control(datepicker ng-model="dt" min-date="minDate" show-weeks="true" class="well well-sm" custom-class="getDayClass(date, mode)")
+
+					h4 Popup
+					div.row
+						div.col-md-6
+							p.input-group
+								input(type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dt1" is-open="opened" min-date="minDate" max-date="'2015-06-22'" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close")
+								span(class="input-group-btn")
+								button(type="button" class="btn btn-default" ng-click="open($event)")
+									i.glyphicon.glyphicon-calendar
+						div.col-md-6
+							p.input-group
+								input(type="date" class="form-control" datepicker-popup ng-model="dt2" is-open="opened" min-date="minDate" max-date="'2015-06-22'" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close")
+								span(class="input-group-btn")
+								button(type="button" class="btn btn-default" ng-click="open($event)")
+									i.glyphicon.glyphicon-calendar
+
+					div.row
+						div.col-md-6
+							p Selected date is {{dt2}}
+
+							label Format:
+							select.form-control(ng-model="format" ng-options="f for f in formats")
+					hr
+					button( type="button" class="btn btn-sm btn-info" ng-click="today()") Today</button>
+					button( type="button" class="btn btn-sm btn-default" ng-click="dt = '2009-08-24'") 2009-08-24
+					button( type="button" class="btn btn-sm btn-danger" ng-click="clear()") Clear
+					button( type="button" class="btn btn-sm btn-default" ng-click="toggleMin()" tooltip="After today restriction") Min date
+
+include footer

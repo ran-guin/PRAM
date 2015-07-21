@@ -1,0 +1,43 @@
+div
+  div
+    form#newItemForm(name='newItemForm')
+        table.table.table-bordered.table-hover
+          thead
+            tr.active
+              th Field
+              th Value
+            tr
+              td Name
+              td 
+                input.form-control#new_Item_Name(ng-required=1 type='text' placeholder='-- Name --' ng-model='new_Name' mandatory=1 data-autocomplete="field:Item_Name; options_element:newOptions;")
+            tr
+              td Category
+              td
+                  - var preload = "loadLookup('/pram/api/lookup/Item_Category', 'Item_Category', 'new_Item_Category', '')";
+                  div(ng-dropdown-multiselect="" options="Lookup.Item_Category.options" selected-model="ItemCategories" ng-click="syncLookup('ItemCategories','Item_Category_ID','Item_Category')" extra-settings="MenuSettings" ng-init="#{preload}")
+            tr
+              td Catalog
+              td 
+                input.form-control#new_Item_Catalog(type='text' placeholder='-- Catalog --' ng-model='new_Catalog' data-autocomplete="field:Item_Catalog; options_element:newOptions;" )
+            tr
+              td Cost Estimate
+              td 
+                input.form-control#new_Item_Cost(type='text' placeholder='-- Cost Estimage --' ng-model='new_Cost' )
+           tr
+              td Vendor 
+              td
+                input.form-control#new_Vendor(ng-required=1 type='text' mandatory=1 placeholder='-- Vendor --' ng-model='new_Vendor' data-autocomplete="field:Vendor_Name; onSuccess:<div class='alert alert-success'>Valid Vendor Found</div><P>Click on Id to select; onEmpty:<div class='alert alert-danger'>Vendor not Found</div><P>please contact Admin to add new Vendor; options_element:newOptions; set:new_Vendor_ID,new_Vendor; show:new_Vendor_ID,new_Vendor; target:new_Vendor; query:SELECT DISTINCT Vendor_ID as new_Vendor_ID, Vendor_Name as new_Vendor FROM Vendor")
+                span &nbsp; [ {{ new_Vendor_ID }} ]
+           tr
+              td Description
+              td 
+                textarea.form-control#new_Item_Description(ng-required=1 rows=5 placeholder='--Item Description --' ng-model='new_Description' )
+
+        button.btn.btn-success(type='button' ng-click="newItem(#{Table})" value="Add Item" ng-disabled="newItemForm.$invalid") Add Item(s)
+        p
+        input#newOptions(type='hidden' url="/pram/api/q" dataKey='data' displayBlock='internalMessage' onSuccess="Similar Item Found<P><div class='alert alert-danger'>Please do not create a new Item if this is the same thing</div>" onEmpty="<div class='alert alert-success'>No Similar Items Found - (Okay)</div>" query="SELECT DISTINCT Item_Name,Item_Catalog FROM Item" show="Item_Name,Item_Catalog")
+        input#new_Vendor_ID(type='hidden' ng-model='new_Vendor_ID')
+  hr
+  div#internalMessage
+
+ 

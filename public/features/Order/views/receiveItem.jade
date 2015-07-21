@@ -1,0 +1,36 @@
+div
+  div
+    form#receiveItemForm(name='receiveItem' ng-submit="recordReceipt()")
+      p Received: 
+        b {{ timestamp }}
+        span &nbsp; By: &nbsp;
+        b {{ user }}
+      p Vendor: &nbsp;
+        b {{ Vendor }}
+      p
+        a(href="#")
+          button.btn.btn-success(type='button' ng-click="receiveAll()") Received in Full
+      hr
+      table.table.table-bordered.table-hover
+        thead
+          tr.active
+            th Item
+            th Catalog
+            th Requested
+            th Received
+            th Notes
+        tr(ng-repeat="item in items") 
+          td {{ item.Name }}
+          td {{ item.Catalog }}
+          td {{ item.Qty }}
+          td 
+            input.form-control(type='number' ng-model='item.Rcvd_Qty' placeholder='-- # Rcvd --' ng-required=1)      
+          td
+            input.form-control(type='textarea' ng-model='item.Notes' placeholder='-- # Notes --' ng-required=1)
+      a(href="#")
+        button.btn.btn-primary(type='submit' ng-click="recordReceipt()" ng-disabled="receiveItem.$invalid") Record Receipt
+
+  hr
+  div#internalMessage
+
+ 

@@ -1,0 +1,16 @@
+div
+  div
+    form#editItemRequestorm(name='editItemRequestForm')
+        table.table.table-bordered.table-hover
+          thead
+            tr.active
+              th Field
+              th Value
+            tr
+              td Name
+              td 
+                input.form-control#edit_Item_Name(ng-required=1 type='text' placeholder='-- Name --' ng-model="item[0].Name" mandatory=1)
+  hr
+  div#internalMessage
+
+ 

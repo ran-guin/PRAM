@@ -1,0 +1,23 @@
+extends simpleLayout
+block content
+    h2 #{title}
+    h3 #{table}
+    p #{Fields.length} fields
+   
+    - var h_style = header_style || "background-color:#ccc"
+    - var t_style = table_style || ''
+  
+    table.table.table-bordered.table-hover(style='#{t_style}')
+        tr(style='#{h_style}')
+            th Field
+            th Value
+        each field in Fields
+          tr
+            td= field
+            td
+              - var val = '';
+              if data 
+                - val = data[0][field]
+                p #{val}
+              else 
+                input(type='text')

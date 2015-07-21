@@ -1,0 +1,32 @@
+extends layout
+block content
+  h4 Prototype Purchase Request & Asset Management System
+  p This is simply the first phase of a proposed interface for Purchasing at the GSC
+  p The primary requirements at this stage are:
+  ul
+    li Supply functionality currently provided by GSOT (from request stage to reconciliation)
+    li Retain current process protocols using PHSA ordering system
+    li Solve a number of current problems/limitations with the GSOT system:
+      ul
+        li Enable an order to supply requests from more than one person
+        li Improve poorly organized database schema 
+    li Make a number of 'low hanging fruit' improvements right away
+      ul  
+        li Improve capabilities for searching existing requests/orders
+        li Enable 'cloning' of existing requests (eg simplifies re-ordering of batches of items regularly requested together)
+        li Enable inclusion of multiple requests (by different users) in a single order
+        li Enable inclusion of multiple requests (applied to distinct cost centres) in one order 
+        li Provide a number of easily accessible reports / views for rapid access to pending orders.
+    li Design in a way that may be scaled up to provide significant functionality advances
+      ul
+        li Make easily configurable
+        li Supply clean and reusable api for accessing data by third parties if required (eg enable third party communication with LIMS to ensure data integrity on both sides)
+        li Enable possibility of longer term expansion to include Asset Tracking
+
+  p To make use of parallel investigations into some other web application frameworks, the prototype has been designed using NodeJS and AngularJS.
+  p This may be adapted if necessary, though at this stage, these seem to offer quite a robust and clean option for the front and back end.
+
+  h5 Some other Improvements to functionality expected prior to production use:
+  ul
+    li Secure Login / Authorization protocol for users of various types
+    li Web retrieval of currency exchange rates to reflect real time cost conversion for purchases in US dollars or Euros 

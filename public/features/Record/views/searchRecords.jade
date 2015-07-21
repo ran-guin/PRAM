@@ -1,0 +1,16 @@
+extends layout
+block content
+ div(ng-app="recordApp")
+  div(ng-controller="recordController")
+   form(ng-app='recordApp')
+    h3 Search {{ table }} Records  
+    hr
+    form#searchForm(ng-submit="searchRecords()")
+        table.table.table-bordered.table-hover
+            tr(ng-repeat="field in fields")
+                td {{ field.Name }}
+                td
+                    input.form-control(type='text' placeholder='-- {{ field.Name }} --')
+        button(type='submit') Add Record
+    p
+    div#message
