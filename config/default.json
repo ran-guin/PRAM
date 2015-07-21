@@ -1,0 +1,13 @@
+{
+    "port" : "8080",
+    "url" : "http://yourserver.ca/pram",
+    "lookup" : { 
+        "Cost_Centre" : "Concat(Cost_Centre_Code, ' : ', Cost_Centre_Description)",
+        "Item_Category" : "Item_Category_Description",
+        "User" : "User_Name"
+    },
+    "dbc" : {
+        "host" : "yourserver.ca",
+        "dbase" : "purch"
+    }
+}
