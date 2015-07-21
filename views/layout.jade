@@ -1,0 +1,15 @@
+doctype html
+html(lang="en")
+  head
+    meta(content="width=device-width, initial-scale=1.0", name="viewport")
+    include css.jade
+  body.body#body
+    div.full-size-container#full-size-container
+      #primaryHeader.primaryHeader
+        include header.jade
+      div.container.container#container(style='width:95%')
+        block content
+  #PORT(type='hidden' value='#{port}')
+  #config(type='hidden' value='#{config}')
+  footer
+    include footer.jade

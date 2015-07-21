@@ -1,0 +1,28 @@
+extends layout
+block content
+ div(ng-app='myApp')
+  div(ng-controller='RequestCtrl')
+    div.alert.alert-danger(ng-show="error") {{error}}
+    if title
+      div.alert.alert-warning #{title}
+    if data
+      b found #{data.length} Records
+      hr
+      
+      table.table.dataTable#ReportTable
+        tr
+          th &nbsp;
+          each value, key in data[0]
+            th #{key}
+        each record,i in data
+          tr
+            td 
+              - var value = data[i]['ID']
+              a(href="../#{type}/#{value}")
+                button Open
+            each value, key in data[i]
+              td #{value}
+    else 
+      h3 No Data Records found
+
+include footer

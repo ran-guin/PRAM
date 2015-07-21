@@ -1,0 +1,32 @@
+doctype html
+html(lang="en")
+  head
+    meta(content="width=device-width, initial-scale=1.0", name="viewport")
+    link(href="/www/css/bootstrap.min.css" type="text/css" rel="stylesheet")
+  body.body#body(style="position:fixed; top:50px; width:100%")
+    div.full-size-container#full-size-container(style="width:100%")
+      div.container(style="width:90%")
+        #primaryHeader.navbar-fixed-top.primaryHeader  
+        #container.container.col-md-12(style="width:100%; padding:1%; margin: 2px;")
+          p Status: #{status}
+          - var cols = []
+
+          - var columns = 0
+          - var records = 0
+          table(border=1) 
+            each record, index in data 
+              if typeof(record)=='object'
+                - records++
+                if (records == 1) 
+                  tr
+                  each value, key in record
+                    th
+                      h3= key
+                tr
+                each value, key in record
+                  td
+                    h3= value
+          h3= records + ' x ' + columns
+          block content
+  footer
+    include footer.jade
