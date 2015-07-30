@@ -310,15 +310,15 @@ app.controller('OrderCtrl',
         $scope.Autocomplete = {
             url : '/pram/api/q',
             target : 'Item_Name',
-            show : "Requester.User_Name,Request_Date,Item_Category_Description,Item_Name,Item_Description,Item_Catalog,Vendor_Name,Unit_Qty, Item_Cost, Unit_Cost,Item_Request_Notes, Deliver_To, Received_Qty, Received_Date",
+            show : "Requested_By,Request_Date,Item_Category_Description,Item_Name,Item_Description,Item_Catalog,Vendor_Name,Unit_Qty, Item_Cost, Unit_Cost,Item_Request_Notes, Deliver_To, Received_Qty, Received_Date",
             search : 'Request_Date,Requested_By,Qty,Item_Cost,Name,Vendor,Catalog,DeliverTo,CostCentre,Notes',
             hide: 'Item_Request_ID,Vendor_ID,CostCentreCostCentreID,Unit_Cost',
             query_table : "(Item, Item_Request, Request, User AS Requester) JOIN Item_Category ON FK_Item_Category__ID=Item_Category_ID LEFT JOIN Vendor ON Vendor_ID=FK_Vendor__ID",
-            query_field : "Vendor_Phone, Requester.User_Name, Request_Date,Item_Request_ID,Item_Category_Description,Unit_Qty,Item_Name,Item_Catalog,Vendor_ID,Vendor_Name, Item_Cost,Item_Request_Notes,Deliver_To, Item_Request_Notes",
+            query_field : "Vendor_Phone, Requester.User_Name as Requested_By, Request_Date,Item_Request_ID,Item_Category_Description,Unit_Qty,Item_Name,Item_Catalog,Vendor_ID,Vendor_Name, Item_Cost,Item_Request_Notes,Deliver_To, Item_Request_Notes",
             query_condition : "FK_Request__ID=Request_ID AND FKRequester_User__ID=Requester.User_ID AND FK_Item__ID=Item_ID AND Request_ID=FK_Request__ID",
             group : "Item_Request_ID",
             // query : "SELECT DISTINCT User_Name,Request_Date,Item_Request_ID,Item_Category_Description,Unit_Qty,Item_Name,Item_Catalog,Vendor_ID,Vendor_Name, CASE WHEN Unit_Cost IS NULL THEN Item_Cost ELSE Unit_Cost END as Unit_Cost,Item_Request_Notes,Deliver_To, Item_Request_Notes FROM (Item, Item_Request, Request, User) JOIN Item_Category ON FK_Item_Category__ID=Item_Category_ID LEFT JOIN Vendor ON Vendor_ID=FK_Vendor__ID WHERE FK_Request__ID=Request_ID AND FKRequester_User__ID=User_ID AND FK_Item__ID=Item_ID AND Request_ID=FK_Request__ID",
-            set : "Vendor_Phone, Item_Category_Description,Unit_Qty,Short_Qty, Item_Cost,Item_Name,Item_Catalog,Vendor_ID,Vendor_Name,Item_Request_ID,User_Name,Request_Date,Item_Request_Notes, Deliver_To,Requested_By",
+            set : "Vendor_Phone, Item_Category_Description,Unit_Qty,Short_Qty, Item_Cost,Item_Name,Item_Catalog,Vendor_ID,Vendor_Name,Item_Request_ID,User_Name,Request_Date,Item_Request_Notes, Deliver_To, Requested_By",
             condition : "FK_Item_Category__ID IN (<Item_Category>)",
             onEmpty : "No Requested Items found.<P><div class='alert alert-warning'>Please try different spellings or different field to search.</div>\n"
         };
@@ -423,22 +423,31 @@ app.controller('OrderCtrl',
             if ($scope.recordStatus == 'Pending') {
                 var highlight_element = document.getElementById('pendingHeader');
                 if (highlight_element) { highlight_element.setAttribute('style', $scope.highlightBackground) }
-           }
+                $scope.open_search();
+            }
             else if ($scope.recordStatus == 'Requisitioned') {
                 var highlight_element = document.getElementById('requisitionedHeader');
                 if (highlight_element) { highlight_element.setAttribute('style', $scope.highlightBackground) }
-           }
+                $scope.close_search();
+            }
             else if ($scope.recordStatus == 'Ordered') {
                 var highlight_element = document.getElementById('orderedHeader');
                 if (highlight_element) { highlight_element.setAttribute('style', $scope.highlightBackground) }
+                $scope.close_search();
             }
             else if ($scope.recordStatus == 'Received in Full') {
                 var highlight_element = document.getElementById('receivedHeader');
                 if (highlight_element) { highlight_element.setAttribute('style', $scope.highlightBackground) }
+                $scope.close_search();
+           }  
+           else if ($scope.recordStatus == 'Reconciled') {
+                $scope.close_search();
            }  
            else {
-            console.log('unrecognized status: ' + $scope.recordStatus);
+              console.log('unrecognized status: ' + $scope.recordStatus);
+              $scope.close_search();
            }
+           console.log('adjusted search status');
         });
     }
 
@@ -474,7 +483,7 @@ app.controller('OrderCtrl',
     }
 
     $scope.createRequisition = function () {
-       $scope.costCentre = $scope.Cost_Centre.id;
+       $scope.costCentre = $scope.CostCentre.id;
 
         var data = { 
             'FKOwner_User__ID' : $scope.ownerId,
@@ -749,6 +758,11 @@ app.controller('OrderCtrl',
             if ($scope.$parent[att] && $scope.$parent[att] != $scope[att]) { console.log("** Parent  " + att + " = " + $scope.$parent[att]) }
         }
 
+        console.log($scope.statusOptions.length + "** classes **");
+        for (var i=0; i< $scope.statusOptions.length; i++) {
+          var cl = $scope.statusOptions[i];
+          console.log(cl + " class : " + JSON.stringify($scope[cl + 'Class']) );
+        }
         console.log('id: ' + $scope.recordId);
         console.log('url: ' + $scope.url + ' : ' + $scope.$parent.url);
         console.log('config: ' + JSON.stringify($scope.config))
