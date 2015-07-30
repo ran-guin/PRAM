@@ -177,7 +177,7 @@ block content
                   span(ng-if="item.saved && editAccess['Item_Request']")
                     span &nbsp;
                     button.btn.btn-warning.btn-xs(type='button' data-toggle='modal' data-target='#editItemRequestModal') Edit
-                  span(ng-if="!item.saved")
+                  span(ng-if="!item.saved && !PendingClass")
                     span &nbsp;
                     button.btn.btn-success.btn-xs(type='button' data-toggle='modal' ng-click="saveIRChanges($index)") Include &nbsp;                
                   span.nav.pull-right(ng-if="item.Received_Qty >= item.Qty") &nbsp;
