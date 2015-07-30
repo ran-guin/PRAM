@@ -20,6 +20,28 @@ app.controller('Nto1Ctrl',
         $scope.$apply();
     }, update_seconds*1000);
 
+    $scope.init_search_display = function () {
+        if ($scope.recordId) { 
+            $scope.close_search();
+        }
+        else {
+            $scope.open_search();
+        }
+    }
+
+    $scope.open_search = function () {
+        console.log('open search');
+        $scope.search_display = 'block';
+        $scope.alt_display = 'none';
+   }
+    
+    $scope.close_search = function () {
+        console.log('close search');
+        $scope.search_display = 'none';
+        $scope.alt_display = 'block';
+
+    }
+
    $scope.$on('parametersExtended', function () {
    		console.log('extended parameters');
         $scope.Shown = Nto1Factory.Shown;
