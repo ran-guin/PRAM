@@ -1,15 +1,10 @@
-- var v0 = 'block';
-- var v1 = 'none';
-if recordId
-  - v0 = 'none';
-  - v1 = 'block';
-- var iClass = item_Class || 'Item';
-
-button#showSS(style='display:#{v1}' onclick="document.getElementById('smartSearch').style.display='block'; document.getElementById('showSS').style.display='none';") search / add items...
-div#smartSearch(style='display:#{v0}')
+div(ng-init="init_search_display()")
+ button#showSS(style='display:{{alt_display}}' ng-click="open_search()") search / add items...
+ div#smartSearch(style='display:{{search_display}}')
+  
   hr(style='border-width:thick; border-color:black;')
   div#insideSS(style='padding:10px') 
-    button#hideSS(onclick="document.getElementById('smartSearch').style.display='none'; document.getElementById('showSS').style.display='block';") x
+    button#hideSS(ng-click="close_search()") x
 
     form#addItemForm()
           h4 #{search_title}
