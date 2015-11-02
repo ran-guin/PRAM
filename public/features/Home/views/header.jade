@@ -1,4 +1,7 @@
 header.navbar.navbar-default.masthead(role="banner")
+  meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1')
+  link(rel='shortcut icon' href='/images/pramIco.png' id='favicon')
+  title PRAM
   div.container.container-fluid
     div.navbar-header
       button.navbar-toggle.collapsed(type='button' data-toggle='collapse' data-target='main-navbar-collapse-1')
@@ -24,7 +27,7 @@ header.navbar.navbar-default.masthead(role="banner")
           p.navbar-text >
         li#pendingHeader
           a(href='/pram/order/requisition') 
-            div(class='{{RequisitionedClass}}') Requisition
+            div(class='{{PendingClass}}') Requisition
         li
           p.navbar-text >
         li#requisitionedHeader
